@@ -33,22 +33,32 @@ public class TS3ServerQuery {
     /** Polling thread */
     private TS3PollingThread pollingThread;
 
+    /** Semaphore to ensure that only one command is sent at a time */
     private Semaphore commandMutex;
 
+    /** Teamspeak 3 Server Host */
     private String host;
+    
+    /** Teamspeak 3 Server Port */
     private int port;
-    private transient String username;
-    private transient String password;
 
+    /** Executor Service to handle event threads */
     private ExecutorService executorService;
+    
+    /** Event listeners */
     private ArrayList<TS3EventListener> eventListeners;
 
-    public TS3ServerQuery(String host, int port, String username, String password) {
+    /**
+     * Constructor. Initializes the TS3ServerQuery with the Teamspeak 3 host and
+     * port.
+     *
+     * @param host Teamspeak 3 Server Host
+     * @param port Teamspeak 3 Server Port
+     */
+    public TS3ServerQuery(String host, int port) {
         // Set connection settings
         setHost(host);
         setPort(port);
-        setUsername(username);
-        setPassword(password);
 
         // Initialize semaphores/mutexes
         commandMutex = new Semaphore(1);
@@ -60,20 +70,20 @@ public class TS3ServerQuery {
         executorService = Executors.newCachedThreadPool();
     }
 
+    /**
+     * Set the Teamspeak 3 Server Host
+     * @param host Teamspeak 3 Server Host
+     */
     public void setHost(String host) {
         this.host = host;
     }
 
+    /**
+     * Set the Teamspeak 3 Server Port
+     * @param port Teamspeak 3 Server Port
+     */
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public void setPassword(String password) {
-         this.password = password;
     }
 
     public boolean connect() {
@@ -88,13 +98,6 @@ public class TS3ServerQuery {
             // Start them up!
             inputThread.start();
             outputThread.start();
-
-            // Log in
-            TS3Command login = new TS3Command("login");
-            login.add(username).add(password);
-            TS3Result result = execute(login);
-
-            if(result.hasError()) return false;
         } catch(Exception e) {
             e.printStackTrace();
             return false;
@@ -199,11 +202,16 @@ public class TS3ServerQuery {
     }
 
     public static void main(String[] args) throws Exception {
-        TS3ServerQuery q = new TS3ServerQuery("localhost", 10011, "serveradmin", "UyN35cJO");
+        TS3ServerQuery q = new TS3ServerQuery("localhost", 10011);
         q.connect();
 
+        // Command: login serveradmin UyN35cJO
+        TS3Result result = q.execute("login serveradmin UyN35cJO");
+        System.out.println(result);
+
+        // Command: use sid=1
         TS3Command use = (new TS3Command("use")).add("sid", 1);
-        TS3Result result = q.execute(use);
+        result = q.execute(use);
         System.out.println(result);
 
         // Register all notifications
