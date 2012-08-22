@@ -1,16 +1,20 @@
 package net.visualcoding.ts3serverquery;
 
-import net.visualcoding.ts3serverquery.event.*;
-
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.lang.Runnable;
-import java.util.Arrays;
-import java.util.Map;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Semaphore;
+
+import net.visualcoding.ts3serverquery.event.TS3ClientConnectedEvent;
+import net.visualcoding.ts3serverquery.event.TS3ClientDisconnectedEvent;
+import net.visualcoding.ts3serverquery.event.TS3ClientMovedEvent;
+import net.visualcoding.ts3serverquery.event.TS3Event;
+import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 
 /**
  * TS3ServerQuery is a low-level interface for communicating with a Teamspeak 3
@@ -27,8 +31,8 @@ public class TS3ServerQuery {
     /** Input thread */
     private TS3InputThread inputThread;
 
-    /** Output thread */
-    private TS3OutputThread outputThread;
+    /** Writer object for sending commands */
+    private TS3Writer writer;
 
     /** Polling thread */
     private TS3PollingThread pollingThread;
@@ -102,41 +106,52 @@ public class TS3ServerQuery {
         this.port = port;
     }
 
-    public boolean connect() {
-        try {
-            // Open up a connection to the TS3 Server Query (telnet)
-            connection = new Socket(host, port);
+    /**
+     * Connects to the TS3 Server through the Server Query interface.
+     * 
+     * @throws UnknownHostException
+     * @throws IOException
+     */
+    public void  connect() throws UnknownHostException, IOException {
+        // Open up a connection to the TS3 Server Query (telnet)
+        connection = new Socket(host, port);
 
-            // Create our input/output threads
-            inputThread = new TS3InputThread(this, connection.getInputStream());
-            outputThread = new TS3OutputThread(this, connection.getOutputStream());
+        // Create our input (listening) thread
+        inputThread = new TS3InputThread(this, connection.getInputStream());
+        
+        // Instantiate a writer object for sending output
+        writer = new TS3Writer(new OutputStreamWriter(
+                connection.getOutputStream()));
 
-            // Start them up!
-            inputThread.start();
-            outputThread.start();
-        } catch(Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
+        // Start up the listening thread
+        inputThread.start();
     }
 
-    public TS3Result execute(String command) throws InterruptedException {
+    public TS3Result execute(String command)
+            throws InterruptedException, IOException {
         if(command.isEmpty()) return null;
 
-        commandMutex.acquire(); // Only allow one command to execute at a time
-
-        outputThread.send(command);
+        /* Only allow one command to execute at a time, this way we don't
+         * receive a response that is intended for another command. */
+        commandMutex.acquire();
+        
+        // Send the command through our writer
+        writer.write(command);
+        writer.newLine();
+        writer.flush();
+        
+        // Wait for a response and enclose in a TS3Result object
         String[] response = inputThread.nextResponse();
         TS3Result result = new TS3Result(response);
 
+        // Allow other commands to execute
         commandMutex.release();
 
         return result;
     }
 
-    public TS3Result execute(TS3Command command) throws InterruptedException {
+    public TS3Result execute(TS3Command command)
+            throws InterruptedException, IOException {
         return execute(command.toString());
     }
 
