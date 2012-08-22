@@ -71,6 +71,22 @@ public class TS3ServerQuery {
     }
 
     /**
+     * Get the Teamspeak 3 Server Host
+     * @return Teamspeak 3 Server Host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * Get the Teamspeak 3 Server Port
+     * @return Teamspeak 3 Server Port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
      * Set the Teamspeak 3 Server Host
      * @param host Teamspeak 3 Server Host
      */
