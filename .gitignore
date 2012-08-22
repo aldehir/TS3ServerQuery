@@ -1,0 +1,15 @@
+# Java Class files
+*.class
+
+# Maven stuff
+build/*
+target/*
+
+# VIM Swap/Backup Files
+*~
+*.swp
+*.swap
+
+# SublimeText2 Project Files
+*.sublime-project
+*.sublime-workspace
