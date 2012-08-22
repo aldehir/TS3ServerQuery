@@ -13,3 +13,8 @@ target/*
 # SublimeText2 Project Files
 *.sublime-project
 *.sublime-workspace
+
+# Eclipse project files
+.classpath
+.project
+.settings/*
