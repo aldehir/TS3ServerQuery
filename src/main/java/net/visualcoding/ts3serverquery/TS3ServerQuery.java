@@ -13,11 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Executor;
 
 /**
- * TS3ServerQuery allows you to interact with the TS3
- * ServerQuery Telnet interface. Basic methods for executing
- * commands and listening for notifications are provided.
- * The class is, for the most part, thread-safe.
- *
+ * TS3ServerQuery is a low-level interface for communicating with a Teamspeak 3
+ * server through the Teamspeak 3 Server Query.
+ * 
  * @author Aldehir Rojas
  * @version 1.0
  */
@@ -27,10 +25,10 @@ public class TS3ServerQuery {
     private Socket connection;
 
     /** Input thread */
-    private InputThread inputThread;
+    private TS3InputThread inputThread;
 
     /** Output thread */
-    private OutputThread outputThread;
+    private TS3OutputThread outputThread;
 
     /** Polling thread */
     private TS3PollingThread pollingThread;
@@ -84,8 +82,8 @@ public class TS3ServerQuery {
             connection = new Socket(host, port);
 
             // Create our input/output threads
-            inputThread = new InputThread(this, connection.getInputStream());
-            outputThread = new OutputThread(this, connection.getOutputStream());
+            inputThread = new TS3InputThread(this, connection.getInputStream());
+            outputThread = new TS3OutputThread(this, connection.getOutputStream());
 
             // Start them up!
             inputThread.start();

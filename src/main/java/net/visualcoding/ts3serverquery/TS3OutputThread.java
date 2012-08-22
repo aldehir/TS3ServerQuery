@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-public class OutputThread extends Thread {
+public class TS3OutputThread extends Thread {
     private TS3ServerQuery serverQuery;
     private BlockingQueue<String> queue;
     private OutputStream stream;
 
-    public OutputThread(TS3ServerQuery serverQuery, OutputStream stream) {
+    public TS3OutputThread(TS3ServerQuery serverQuery, OutputStream stream) {
         this.serverQuery = serverQuery;
         this.stream = stream;
 
