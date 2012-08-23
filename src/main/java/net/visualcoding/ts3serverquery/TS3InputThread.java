@@ -18,7 +18,7 @@ public class TS3InputThread extends Thread {
         this.stream = stream;
 
         // Instantiate our blocking queue
-        queue = new ArrayBlockingQueue(20);
+        queue = new ArrayBlockingQueue<String>(20);
     }
 
     public void run() {
@@ -43,6 +43,8 @@ public class TS3InputThread extends Thread {
             }
         } catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            try { reader.close(); } catch(Exception e) { }
         }
     }
 

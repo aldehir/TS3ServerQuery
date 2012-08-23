@@ -39,7 +39,7 @@ public class TS3PollingThread extends Thread {
                 } catch(Exception e) { }
             }
 
-            System.out.println(currentClients);
+            // System.out.println(currentClients);
 
             // Send disconnected events and delete disconnected clients from our map
             Iterator<Map.Entry<Integer, ClientInfo>> mapIt = map.entrySet().iterator();

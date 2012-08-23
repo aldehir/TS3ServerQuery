@@ -17,5 +17,11 @@ public class TS3Writer extends BufferedWriter {
     public void newLine() throws IOException {
         write("\n\r");
     }
+    
+    public void writeLine(String line) throws IOException {
+        write(line);
+        newLine();
+        flush();
+    }
 
 }

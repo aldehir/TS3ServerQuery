@@ -10,9 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import net.visualcoding.ts3serverquery.event.TS3ClientConnectedEvent;
-import net.visualcoding.ts3serverquery.event.TS3ClientDisconnectedEvent;
-import net.visualcoding.ts3serverquery.event.TS3ClientMovedEvent;
 import net.visualcoding.ts3serverquery.event.TS3Event;
 import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 
@@ -22,6 +19,9 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
  * 
  * @author Aldehir Rojas
  * @version 1.0
+ * 
+ * @todo Implement handling of server and channel notifications, i.e. when
+ *       the polling thread is not spawned.
  */
 public class TS3ServerQueryClient {
 
@@ -51,10 +51,20 @@ public class TS3ServerQueryClient {
     
     /** Event listeners */
     private ArrayList<TS3EventListener> eventListeners;
+    
+    /**
+     * Constructor. Initialize this TS3ServerQueryClient with the Teamspeak 3
+     * server host and default server query port, 10011.
+     * 
+     * @param host Teamspeak 3 Server Host
+     */
+    public TS3ServerQueryClient(String host) {
+        this(host, 10011);
+    }
 
     /**
-     * Constructor. Initializes the TS3ServerQuery with the Teamspeak 3 host and
-     * port.
+     * Constructor. Initializes this TS3ServerQueryClient with the Teamspeak 3
+     * server host and port.
      *
      * @param host Teamspeak 3 Server Host
      * @param port Teamspeak 3 Server Port
@@ -230,8 +240,23 @@ public class TS3ServerQueryClient {
             TS3Command command = new TS3Command("servernotifyregister");
             command.add("event", event);
 
+
             try {
-                TS3Result result = execute(command);
+                TS3Result result;
+                
+                // Handle the channel event differently
+                if(event.equalsIgnoreCase("channel")) {
+                    // Get our current channel id by calling "whoami"
+                    result = execute("whoami");
+                    String channelId = result.getFirst()
+                            .get("client_channel_id");
+                    
+                    // Add in the id to the command map
+                    command.add("id", channelId);
+                }
+                
+                // Execute the command
+                result = execute(command);
                 if(result.hasError()) allSuccessful = false;
             } catch(Exception e) {
                 allSuccessful = false;
@@ -247,6 +272,10 @@ public class TS3ServerQueryClient {
         return allSuccessful;
     }
 
+    /**
+     * Notify the event listeners that an event has occurred.
+     * @param notification Raw notification string from the TS3 Server Query.
+     */
     protected void notify(String notification) {
         // Split into the notification type and it's values
         String[] parts = notification.split("\\s+", 2);
@@ -273,6 +302,10 @@ public class TS3ServerQueryClient {
         }
     }
 
+    /**
+     * Notify the event listeners that an event has occurred.
+     * @param event TS3Event to send to the event listeners.
+     */
     protected void notify(final TS3Event event) {
         // Don't spawn a thread if we have no event listeners
         synchronized(eventListeners) {
@@ -294,81 +327,13 @@ public class TS3ServerQueryClient {
        executorService.submit(task);
     }
 
+    /**
+     * Add an event listener
+     * @param listener Listener to add
+     */
     public void addEventListener(TS3EventListener listener) {
         synchronized(eventListeners) {
             eventListeners.add(listener);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        TS3ServerQueryClient q = new TS3ServerQueryClient("localhost", 10011);
-        q.connect();
-
-        // Command: login serveradmin UyN35cJO
-        TS3Result result = q.execute("login serveradmin UyN35cJO");
-        System.out.println(result);
-
-        // Command: use sid=1
-        TS3Command use = (new TS3Command("use")).add("sid", 1);
-        result = q.execute(use);
-        System.out.println(result);
-
-        // Register all notifications
-        if(q.registerNotifications()) {
-            System.out.println("Registered for notifications");
-        }
-
-        // Create an event listener
-        TS3EventListener listener = new TS3EventListener() {
-            public void onClientConnected(TS3ClientConnectedEvent event) {
-                System.out.println("Client connected: " + event.getClientName());
-            }
-
-            public void onClientDisconnected(TS3ClientDisconnectedEvent event) {
-                System.out.println("Client disconnected: " + event.getClientName());
-            }
-
-            public void onClientMoved(TS3ClientMovedEvent event) {
-                System.out.println("Client moved: " + event.getClientName() +
-                        " from " + event.getSource() + " to " + event.getDestination());
-            }
-
-            public void onMessage(TS3MessageEvent event) {
-                System.out.println("Message received from: " + event.getClientName());
-            }
-        };
-
-        // Add listener
-        q.addEventListener(listener);
-
-
-        // Spawn other threads to execute commands (and see how it works with our polling thread)
-        /*
-        while(true) {
-            Thread t = new Thread(new RunnableTest(q));
-            t.start();
-
-            try { Thread.sleep(20); }
-            catch(Exception e) { }
-        }
-        */
-    }
-
-    private static class RunnableTest implements Runnable {
-        private TS3ServerQueryClient serverQuery;
-
-        public RunnableTest(TS3ServerQueryClient serverQuery) {
-            this.serverQuery = serverQuery;
-        }
-
-        public void run() {
-            try {
-                // Execute a command... like "clientlist"
-                TS3Result result = serverQuery.execute("clientlist");
-                if(!result.hasError()) {
-                    System.out.println("Thread executed");
-                }
-            } catch(Exception e) { }
         }
     }
 }
