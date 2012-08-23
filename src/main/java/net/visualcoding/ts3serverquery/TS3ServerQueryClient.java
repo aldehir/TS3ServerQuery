@@ -219,7 +219,7 @@ public class TS3ServerQueryClient {
         events.add("textprivate");
         
         // If we're not using polling, then register the server and channel
-        // events
+        // notifications
         if(!usePolling) {
             events.add("server");
             events.add("channel");
@@ -238,9 +238,11 @@ public class TS3ServerQueryClient {
             }
         }
 
-        // Start our polling thread
-        pollingThread = new TS3PollingThread(this);
-        pollingThread.start();
+        // Start our polling thread if requested
+        if(usePolling) {
+            pollingThread = new TS3PollingThread(this);
+            pollingThread.start();
+        }
 
         return allSuccessful;
     }
