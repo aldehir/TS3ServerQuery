@@ -16,10 +16,22 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class TS3Reader extends BufferedReader {
 
+    /**
+     * Constructor that initializes this reader with the given Reader object
+     *
+     * @param in Reader to read from
+     */
     public TS3Reader(Reader in) {
         super(in);
     }
 
+    /**
+     * Constructor that initializes this reader with the given Reader object
+     * and a buffer of size {@code size}.
+     *
+     * @param in   Reader to read from
+     * @param size Size of the buffer
+     */
     public TS3Reader(Reader in, int size) {
         super(in, size);
     }
@@ -31,6 +43,7 @@ public class TS3Reader extends BufferedReader {
      * @return A String containing the contents of the line, not including
      *         any line-termination characters, or null if the end of the
      *         stream has been reached.
+     * @throws IOException
      */
     public String readLine() throws IOException {
         // Read in the line (up to the linefeed)

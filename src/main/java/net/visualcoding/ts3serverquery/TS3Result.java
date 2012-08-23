@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * This class is a container for the TS3 Server Query responses.
+ *
+ * @author Aldehir Rojas
+ * @version 1.0
+ */
 public class TS3Result {
 
     private ArrayList<Map<String, String>> items;

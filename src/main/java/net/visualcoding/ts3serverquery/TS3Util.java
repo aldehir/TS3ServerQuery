@@ -4,11 +4,23 @@ import java.lang.StringBuilder;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * Utilities class. This class provides basic utilities needed to use the
+ * TS3 Server Query.
+ *
+ * @author Aldehir Rojas
+ * @version 1.0
+ */
 public class TS3Util {
 
+    /** Mapping of characters to their escaped versions */
     private static final Map<Integer, Integer> escapeChars;
+    /** Mapping of escaped characters to the actual charater */
     private static final Map<Integer, Integer> unescapeChars;
 
+    // Initialization. Since the methods are all static, there is no
+    // instantiation of an object to perform the initialization. Instead,
+    // we perform it here and initialize the character maps.
     static {
         // Instantiate maps
         escapeChars = new HashMap<Integer, Integer>(17);
@@ -33,6 +45,11 @@ public class TS3Util {
         }
     }
 
+    /**
+     * Escape {@code str} using the TS3 Server Query escape characters.
+     * @param str String to escape
+     * @return Escaped string
+     */
     public static String escape(String str) {
         StringBuilder sb = new StringBuilder();
 
@@ -55,6 +72,11 @@ public class TS3Util {
         return sb.toString();
     }
 
+    /**
+     * Unescape {@code str} using the TS3 Server Query escape characters.
+     * @param str String to unescape
+     * @return Unescaped string
+     */
     public static String unescape(String str) {
         StringBuilder sb = new StringBuilder();
 
@@ -87,6 +109,15 @@ public class TS3Util {
         return sb.toString();
     }
 
+    /**
+     * Parse a TS3ServerQuery string representation of a map into an actual
+     * map. This method automatically unescapes the values of the keys.
+     * 
+     * @todo Rename to {@code parseMap()}, as it makes more sense.
+     * 
+     * @param line String representation of a map to parse
+     * @return Map containing the key-value pairs in the string.
+     */
     public static Map<String, String> parseDetails(String line) {
         // Create a map
         Map<String, String> map = new HashMap<String, String>(13);
