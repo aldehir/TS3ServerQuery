@@ -9,11 +9,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.ArrayList;
 
 public class TS3InputThread extends Thread {
-    private TS3ServerQuery serverQuery;
+    private TS3ServerQueryClient serverQuery;
     private BlockingQueue<String> queue;
     private InputStream stream;
 
-    public TS3InputThread(TS3ServerQuery serverQuery, InputStream stream) {
+    public TS3InputThread(TS3ServerQueryClient serverQuery, InputStream stream) {
         this.serverQuery = serverQuery;
         this.stream = stream;
 

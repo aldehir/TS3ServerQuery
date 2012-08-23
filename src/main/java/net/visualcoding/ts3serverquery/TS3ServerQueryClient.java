@@ -23,7 +23,7 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
  * @author Aldehir Rojas
  * @version 1.0
  */
-public class TS3ServerQuery {
+public class TS3ServerQueryClient {
 
     /** Socket connection to the TS3 server */
     private Socket connection;
@@ -59,7 +59,7 @@ public class TS3ServerQuery {
      * @param host Teamspeak 3 Server Host
      * @param port Teamspeak 3 Server Port
      */
-    public TS3ServerQuery(String host, int port) {
+    public TS3ServerQueryClient(String host, int port) {
         // Set connection settings
         setHost(host);
         setPort(port);
@@ -127,6 +127,16 @@ public class TS3ServerQuery {
         inputThread.start();
     }
 
+    /**
+     * Executes a given command
+     * 
+     * @param command Command to execute
+     * @return TS3Result containing the response of the command
+     * @throws InterruptedException
+     * @throws IOException
+     * 
+     * @see #execute(TS3Command)
+     */
     public TS3Result execute(String command)
             throws InterruptedException, IOException {
         if(command.isEmpty()) return null;
@@ -150,19 +160,75 @@ public class TS3ServerQuery {
         return result;
     }
 
+    /**
+     * Executes a given command. This is a wrapper method that is no different
+     * from calling {@code execute(command.toString())}.
+     * 
+     * @param command TS3Command object of the command to execute
+     * @return TS3Result containing the response of the command 
+     * @throws InterruptedException
+     * @throws IOException
+     * 
+     * @see #execute(String)
+     */
     public TS3Result execute(TS3Command command)
             throws InterruptedException, IOException {
         return execute(command.toString());
     }
 
+    /**
+     * Registers the TS3 notifications for receiving text messages and basic
+     * user notifications. This is the equivalent to calling
+     * {@code registerNotifications(true)}.
+     * 
+     * @return True if all the notifications were successfully registered.
+     * @see #registerNotifications(boolean)
+     */
     public boolean registerNotifications() {
+        return registerNotifications(true);
+    }
+    
+    /**
+     * Registers the TS3 notifications for receiving text messages and basic
+     * user notifications. This method is a convenience method for registering
+     * all the text message notifications. It also spawns a polling thread
+     * that polls for the following events:
+     * <ul>
+     * <li>User connected</li>
+     * <li>User disconnected</li>
+     * <li>User moved</li>
+     * </ul>
+     * <p>
+     * A polling thread is necessary to check if users move channels, as the
+     * TS3 Server Query "channel" notifications only notifies if a user moves
+     * in or out of the channel that the query client resides.
+     * <p>
+     * If {@code usePolling} is false, then the default "server" and "channel"
+     * notifications are registered in place of the polling thread.
+     * 
+     * @param usePolling Whether or not to spawn a polling thread
+     * @return True if all the notifications were successfully registered.
+     */
+    public boolean registerNotifications(boolean usePolling) {
         boolean allSuccessful = true;
-        String[] events = { "textserver", "textchannel", "textprivate" };
+        
+        // Add in the events for text messages
+        ArrayList<String> events = new ArrayList<String>(5);
+        events.add("textserver");
+        events.add("textchannel");
+        events.add("textprivate");
+        
+        // If we're not using polling, then register the server and channel
+        // events
+        if(!usePolling) {
+            events.add("server");
+            events.add("channel");
+        }
 
         // Register events
-        for(int i = 0; i < events.length; i++) {
+        for(String event : events) {
             TS3Command command = new TS3Command("servernotifyregister");
-            command.add("event", events[i]);
+            command.add("event", event);
 
             try {
                 TS3Result result = execute(command);
@@ -233,7 +299,7 @@ public class TS3ServerQuery {
     }
 
     public static void main(String[] args) throws Exception {
-        TS3ServerQuery q = new TS3ServerQuery("localhost", 10011);
+        TS3ServerQueryClient q = new TS3ServerQueryClient("localhost", 10011);
         q.connect();
 
         // Command: login serveradmin UyN35cJO
@@ -287,9 +353,9 @@ public class TS3ServerQuery {
     }
 
     private static class RunnableTest implements Runnable {
-        private TS3ServerQuery serverQuery;
+        private TS3ServerQueryClient serverQuery;
 
-        public RunnableTest(TS3ServerQuery serverQuery) {
+        public RunnableTest(TS3ServerQueryClient serverQuery) {
             this.serverQuery = serverQuery;
         }
 

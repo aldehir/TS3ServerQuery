@@ -10,10 +10,10 @@ import java.util.Iterator;
 public class TS3PollingThread extends Thread {
     private static final int LATENCY = 500;
 
-    private TS3ServerQuery serverQuery;
+    private TS3ServerQueryClient serverQuery;
     private Map<Integer, ClientInfo> map = null;
 
-    public TS3PollingThread(TS3ServerQuery serverQuery) {
+    public TS3PollingThread(TS3ServerQueryClient serverQuery) {
         this.serverQuery = serverQuery;
 
         map = new HashMap<Integer, ClientInfo>(151);
