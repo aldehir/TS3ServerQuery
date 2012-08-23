@@ -43,10 +43,17 @@ public class TS3ServerQueryClientTest extends TestCase {
             TS3ServerQueryClient client = new TS3ServerQueryClient("localhost", port);
             client.connect();
             
-            // Register notifications
-            
             // Log in
             client.execute("login user pass");
+
+            // Register notifications
+            client.registerNotifications(false);
+
+            // Assert that these events were registered on the server
+            String[] events = {"textserver", "textchannel", "textprivate"};
+            for(String event : events) {
+                assertTrue(server.isEventRegistered(event));
+            }
         } catch(Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -54,4 +61,5 @@ public class TS3ServerQueryClientTest extends TestCase {
                 
         assertTrue( true );
     }
+
 }

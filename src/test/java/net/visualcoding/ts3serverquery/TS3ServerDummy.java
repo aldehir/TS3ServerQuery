@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Map;
 
 public class TS3ServerDummy extends Thread {
     private int port;
@@ -86,7 +87,7 @@ public class TS3ServerDummy extends Thread {
                 Method method = c.getDeclaredMethod("command_" + split[0], String.class);
                 
                 // Invoke method
-                method.invoke(this, input);
+                method.invoke(this, split[1]);
             } catch(NoSuchMethodException e) {
                 // Command not found error
                 writeError(256, "command not found");
@@ -114,7 +115,22 @@ public class TS3ServerDummy extends Thread {
     }
     
     protected void command_servernotifyregister(String cmd) throws Exception {
-        
+        // Parse the map
+        Map<String, String> details = TS3Util.parseDetails(cmd);
+
+        // Get the event name
+        String event = details.get("event");
+
+        // Don't do anything if the event is channel and a channel id is not
+        // passed
+        if(event.equalsIgnoreCase("channel")) {
+            if(details.containsKey("id")) return;
+        }
+
+        // Add event to our notifications set
+        notifications.add(event);
+
+        writeError();
     }
     
     protected void write(String line) throws Exception {
@@ -147,6 +163,10 @@ public class TS3ServerDummy extends Thread {
         
         if(client == null) return false;
         return client.channel == channel;
+    }
+
+    public boolean isEventRegistered(String event) {
+        return notifications.contains(event);
     }
     
     /**
