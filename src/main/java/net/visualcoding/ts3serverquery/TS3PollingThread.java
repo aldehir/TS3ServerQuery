@@ -22,21 +22,19 @@ public class TS3PollingThread extends Thread {
     public void run() {
         while(true) {
             TS3Result result = null;
-            
+
             try {
                 // Get all the clients connected
                 result = serverQuery.execute("clientlist -uid");
             } catch(Exception e) { continue; }
 
             // Create a hash map of the currently connected clients
-            HashMap<Integer, Map<String, String>> currentClients = new HashMap<Integer, Map<String, String>>(151);
+            HashMap<Integer, TS3Map> currentClients = new HashMap<Integer, TS3Map>(151);
 
             // Add results to our hash map of clients
-            for(Map<String, String> item : result.getItems()) {
-                try {
-                    int clientId = Integer.parseInt(item.get("clid"));
-                    currentClients.put(clientId, item);
-                } catch(Exception e) { }
+            for(TS3Map item : result.getItems()) {
+                int clientId = item.getInteger("clid").intValue();
+                currentClients.put(clientId, item);
             }
 
             // System.out.println(currentClients);
@@ -57,9 +55,9 @@ public class TS3PollingThread extends Thread {
             }
 
             // Send connected events, add clients to our map and delete them from currentClients
-            Iterator<Map.Entry<Integer, Map<String, String>>> clientsIt = currentClients.entrySet().iterator();
+            Iterator<Map.Entry<Integer, TS3Map>> clientsIt = currentClients.entrySet().iterator();
             while(clientsIt.hasNext()) {
-                Map.Entry<Integer, Map<String, String>> item = clientsIt.next();
+                Map.Entry<Integer, TS3Map> item = clientsIt.next();
 
                 if(!map.containsKey(item.getKey())) {
                     clientsIt.remove();
@@ -84,7 +82,7 @@ public class TS3PollingThread extends Thread {
             // Send moved events
             clientsIt = currentClients.entrySet().iterator();
             while(clientsIt.hasNext()) {
-                Map.Entry<Integer, Map<String, String>> item = clientsIt.next();
+                Map.Entry<Integer, TS3Map> item = clientsIt.next();
 
                 if(map.containsKey(item.getKey())) {
                     // Get the info from the map
