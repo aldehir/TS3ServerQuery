@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 public class TS3ServerDummy extends Thread {
     protected int port;
@@ -29,8 +30,16 @@ public class TS3ServerDummy extends Thread {
     protected Random random;
     protected SecureRandom secureRandom;
 
-    protected Semaphore semEventReceived;
-    protected Semaphore semEvents;
+    /* Binary semaphores */
+    protected Semaphore semEventReceived = new Semaphore(0);
+    protected Semaphore semEvents = new Semaphore(0);
+
+    protected Semaphore semFirstClientList = new Semaphore(0);
+    protected boolean firstClientList = true;
+
+    protected Map<String, Semaphore> semMsgMap = new HashMap<String, Semaphore>();
+    protected Semaphore semMessages = new Semaphore(0);
+    protected Semaphore semMsgReceived = new Semaphore(0);
 
     public TS3ServerDummy(int port) {
         this.port = port;
@@ -50,9 +59,9 @@ public class TS3ServerDummy extends Thread {
         // notifications that were registered
         notifications = new HashSet<String>();
 
-        // Initialize binary semaphores
-        semEventReceived = new Semaphore(0);
-        semEvents = new Semaphore(0);
+        semMsgMap.put("textserver", new Semaphore(0));
+        semMsgMap.put("textprivate", new Semaphore(0));
+        semMsgMap.put("textchannel", new Semaphore(0));
     }
 
     protected TS3Map createRandomClient(int id) {
@@ -96,6 +105,10 @@ public class TS3ServerDummy extends Thread {
         Thread t = new Thread(new ClientMapChanger(this));
         t.start();
 
+        // Spawn the messenger thread
+        Thread tMsg = new Thread(new Messenger(this));
+        tMsg.start();
+
         // Listen for input
         String input;
         while((input = reader.readLine()) != null) {
@@ -138,6 +151,12 @@ public class TS3ServerDummy extends Thread {
 
         write(sb.toString());
         writeError();
+
+        // If this was the first client list query, then signal our semaphore
+        if(firstClientList) {
+            semFirstClientList.release();
+            firstClientList = false;
+        }
     }
 
     protected void command_servernotifyregister(String cmd) throws Exception {
@@ -154,6 +173,11 @@ public class TS3ServerDummy extends Thread {
 
         // Add event to our notifications set
         notifications.add(event);
+
+        // Release the message semaphore
+        if(semMsgMap.containsKey(event)) {
+            semMsgMap.get(event).release();
+        }
 
         writeError();
     }
@@ -210,8 +234,9 @@ public class TS3ServerDummy extends Thread {
         }
 
         protected void runChanger() throws InterruptedException {
-            // Wait until the polling thread for the client starts up
-            Thread.sleep(1000);
+            // Wait until the first client list was called before making any
+            // changes. This way we don't deadlock
+            assert semFirstClientList.tryAcquire(1000, TimeUnit.MILLISECONDS);
 
             // Remove a client from the map
             server.clients.remove(1);
@@ -236,6 +261,69 @@ public class TS3ServerDummy extends Thread {
         protected void waitForResponse() throws InterruptedException {
             // Wait until the event was received
             assert semEventReceived.tryAcquire(5000, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private class Messenger implements Runnable {
+        TS3ServerDummy server;
+
+        public Messenger(TS3ServerDummy server) {
+            this.server = server;
+        }
+
+        public void run() {
+            try {
+                runMessenger();
+            } catch(InterruptedException e) {
+
+            } catch(IOException e) {
+
+            } catch(Exception e) {
+
+            }
+        }
+
+        protected void runMessenger() throws InterruptedException, IOException,
+                 Exception {
+            // Wait until the client registers the notifications
+            for(Semaphore sem : semMsgMap.values()) {
+                assert sem.tryAcquire(5, TimeUnit.SECONDS);
+            }
+
+            String prefix = "notifytextmessage ";
+            TS3Map map = new TS3Map();
+            map.add("invokerid", 521);
+            map.add("invokername", "server");
+            map.add("invokeruid", "uid of invoker");
+
+            // Send a private text message
+            map.add("targetmode", 1);
+            map.add("msg", "Private text message!");
+            server.write(prefix + map.toString());
+            waitForResponse();
+
+            // Send a channel message
+            map.remove("targetmode");
+            map.remove("msg");
+            map.add("targetmode", 2);
+            map.add("msg", "Channel text message!");
+            server.write(prefix + map.toString());
+            waitForResponse();
+
+            // Send a server message
+            map.remove("targetmode");
+            map.remove("msg");
+            map.add("targetmode", 3);
+            map.add("msg", "Server text message!");
+            server.write(prefix + map.toString());
+            waitForResponse();
+
+            // Signal that we're done sending messages
+            semMessages.release();
+        }
+
+        protected void waitForResponse() throws InterruptedException {
+            assert semMsgReceived.tryAcquire(5, TimeUnit.SECONDS);
         }
     }
 }
