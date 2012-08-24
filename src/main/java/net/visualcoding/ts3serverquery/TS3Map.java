@@ -173,6 +173,22 @@ public class TS3Map {
     }
 
     /**
+     * Returns {@code true} if this map is empty.
+     * @return {@code true} if this map is empty
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
+     * Returns the size of this map.
+     * @returns the size of this map
+     */
+    public int size() {
+        return map.size();
+    }
+
+    /**
      * Associates the specified value with the specified key in this map. If
      * the map already contains the specified key, then the specified value is
      * appended to the list associated with the specified key.
