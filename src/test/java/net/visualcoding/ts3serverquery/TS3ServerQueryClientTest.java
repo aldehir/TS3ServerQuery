@@ -44,7 +44,12 @@ public class TS3ServerQueryClientTest extends TestCase {
             client.connect();
             
             // Log in
-            client.execute("login user pass");
+            //client.execute("login user pass");
+            TS3Map map = new TS3Map();
+            map.add("client_login_name", "user");
+            map.add("client_login_password", "password");
+
+            client.execute("login", map);
 
             // Register notifications
             client.registerNotifications(false);

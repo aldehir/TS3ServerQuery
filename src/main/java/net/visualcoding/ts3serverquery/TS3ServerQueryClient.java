@@ -180,10 +180,33 @@ public class TS3ServerQueryClient {
      * @throws IOException
      * 
      * @see #execute(String)
+     *
+     * @deprecated
      */
+    @Deprecated
     public TS3Result execute(TS3Command command)
             throws InterruptedException, IOException {
         return execute(command.toString());
+    }
+
+    /**
+     * Executes the specified command with the specified arguments.
+     *
+     * @param command   Name of the command to execute
+     * @param arguments Arguments to pass to to the command
+     * @return {@code TS3Result} object containing the response of the
+     *         specified command
+     * 
+     * @throws InterruptedException
+     * @throws IOExeception
+     * 
+     * @see #execute(String)
+     */
+    public TS3Result execute(String command, TS3Map arguments) 
+            throws InterruptedException, IOException {
+        if(arguments == null || arguments.isEmpty())
+            return execute(command);
+        return execute(command + " " + arguments.toString());
     }
 
     /**

@@ -18,7 +18,18 @@ import java.lang.StringBuilder;
  */
 public class TS3Map {
 
-    /** Map used to store the mappings */
+    /**
+     * Map containing the mapping of string keys to a list of string values.
+     * By using a list, we are able to represent keys which contain multiple
+     * values that may be sent through a TS3 Server Query command, such as:
+     * <pre>
+     * {@code
+     * client_id=1|client_id=2|client_id=3
+     * }
+     * <p>
+     * Keys associated with a null value or an empty list is interpretted as
+     * a switch.
+     */
     private Map<String, List<String>> map;
    
     /**

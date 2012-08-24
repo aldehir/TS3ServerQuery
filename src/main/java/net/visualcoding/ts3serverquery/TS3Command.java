@@ -8,6 +8,15 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.lang.StringBuilder;
 
+/**
+ * TS3Command.
+ *
+ * @author Aldehir Rojas
+ * @version 1.0
+ * @deprecated Unnecessary, use {@link TS3Map} in conjunction with
+ *             {@link TS3ServerQueryClient#execute(String, TS3Map)}.
+ */
+@Deprecated
 public class TS3Command {
 
     private String command;
