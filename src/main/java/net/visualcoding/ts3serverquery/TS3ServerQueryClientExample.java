@@ -16,8 +16,9 @@ public class TS3ServerQueryClientExample {
         System.out.println(result);
 
         // Command: use sid=1
-        TS3Command use = (new TS3Command("use")).add("sid", 1);
-        result = q.execute(use);
+        TS3Map useArgs = new TS3Map();
+        useArgs.addInteger("sid", 1);
+        result = q.execute("use", useArgs);
         System.out.println(result);
 
         // Register all notifications

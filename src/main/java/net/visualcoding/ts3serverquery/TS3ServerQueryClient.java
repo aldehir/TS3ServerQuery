@@ -171,25 +171,6 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Executes a given command. This is a wrapper method that is no different
-     * from calling {@code execute(command.toString())}.
-     * 
-     * @param command TS3Command object of the command to execute
-     * @return TS3Result containing the response of the command 
-     * @throws InterruptedException
-     * @throws IOException
-     * 
-     * @see #execute(String)
-     *
-     * @deprecated
-     */
-    @Deprecated
-    public TS3Result execute(TS3Command command)
-            throws InterruptedException, IOException {
-        return execute(command.toString());
-    }
-
-    /**
      * Executes the specified command with the specified arguments.
      *
      * @param command   Name of the command to execute
@@ -260,9 +241,8 @@ public class TS3ServerQueryClient {
 
         // Register events
         for(String event : events) {
-            TS3Command command = new TS3Command("servernotifyregister");
-            command.add("event", event);
-
+            TS3Map arguments = new TS3Map();
+            arguments.add("event", event);
 
             try {
                 TS3Result result;
@@ -274,12 +254,12 @@ public class TS3ServerQueryClient {
                     String channelId = result.getFirst()
                             .get("client_channel_id");
                     
-                    // Add in the id to the command map
-                    command.add("id", channelId);
+                    // Add in the id to the command arguments
+                    arguments.add("id", channelId);
                 }
                 
                 // Execute the command
-                result = execute(command);
+                result = execute("servernotifyregister", arguments);
                 if(result.hasError()) allSuccessful = false;
             } catch(Exception e) {
                 allSuccessful = false;
