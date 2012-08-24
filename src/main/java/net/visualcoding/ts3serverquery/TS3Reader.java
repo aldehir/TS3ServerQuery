@@ -1,11 +1,8 @@
 package net.visualcoding.ts3serverquery;
 
-import java.lang.StringBuilder;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.BufferedReader;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * TS3Reader, this class is simply a wrapper over the BufferedReader

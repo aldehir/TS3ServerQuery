@@ -5,7 +5,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -25,31 +24,31 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
  */
 public class TS3ServerQueryClient {
 
-    /** Socket connection to the TS3 server */
+    /** Socket connection to the TS3 server. */
     private Socket connection;
 
-    /** Input thread */
+    /** Input thread. */
     private TS3InputThread inputThread;
 
-    /** Writer object for sending commands */
+    /** Writer object for sending commands. */
     private TS3Writer writer;
 
-    /** Polling thread */
+    /** Polling thread. */
     private TS3PollingThread pollingThread;
 
-    /** Semaphore to ensure that only one command is sent at a time */
+    /** Semaphore to ensure that only one command is sent at a time. */
     private Semaphore commandMutex;
 
-    /** Teamspeak 3 Server Host */
+    /** Teamspeak 3 Server Host. */
     private String host;
 
-    /** Teamspeak 3 Server Port */
+    /** Teamspeak 3 Server Port. */
     private int port;
 
-    /** Executor Service to handle event threads */
+    /** Executor Service to handle event threads. */
     private ExecutorService executorService;
 
-    /** Event listeners */
+    /** Event listeners. */
     private ArrayList<TS3EventListener> eventListeners;
 
     /**
@@ -85,7 +84,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Get the Teamspeak 3 Server Host
+     * Get the Teamspeak 3 Server Host.
      * @return Teamspeak 3 Server Host
      */
     public String getHost() {
@@ -93,7 +92,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Get the Teamspeak 3 Server Port
+     * Get the Teamspeak 3 Server Port.
      * @return Teamspeak 3 Server Port
      */
     public int getPort() {
@@ -101,7 +100,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Set the Teamspeak 3 Server Host
+     * Set the Teamspeak 3 Server Host.
      * @param host Teamspeak 3 Server Host
      */
     public void setHost(String host) {
@@ -109,11 +108,21 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Set the Teamspeak 3 Server Port
+     * Set the Teamspeak 3 Server Port.
      * @param port Teamspeak 3 Server Port
      */
     public void setPort(int port) {
         this.port = port;
+    }
+
+    /**
+     * Add an event listener.
+     * @param listener Listener to add
+     */
+    public void addEventListener(TS3EventListener listener) {
+        synchronized(eventListeners) {
+            eventListeners.add(listener);
+        }
     }
 
     /**
@@ -138,7 +147,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Executes a given command
+     * Executes a given command.
      *
      * @param command Command to execute
      * @return TS3Result containing the response of the command
@@ -324,15 +333,5 @@ public class TS3ServerQueryClient {
 
        // Now submit our runnable to our executor service
        executorService.submit(task);
-    }
-
-    /**
-     * Add an event listener
-     * @param listener Listener to add
-     */
-    public void addEventListener(TS3EventListener listener) {
-        synchronized(eventListeners) {
-            eventListeners.add(listener);
-        }
     }
 }

@@ -44,7 +44,7 @@ public class TS3Writer extends BufferedWriter {
     public void newLine() throws IOException {
         write("\n\r");
     }
-   
+
     /**
      * Writes the entire line to the buffer, appends the TS3 Server Query line
      * ending, and flushes the buffer.

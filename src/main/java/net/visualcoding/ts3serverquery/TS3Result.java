@@ -11,13 +11,13 @@ import java.util.ArrayList;
  */
 public class TS3Result {
 
-    /** List of items represented by a {@link TS3Map} */
+    /** List of items represented by a {@link TS3Map}. */
     private List<TS3Map> items;
 
-    /** Error code of the command */
+    /** Error code of the command. */
     private int errorCode;
 
-    /** Error message of the command */
+    /** Error message of the command. */
     private String errorMessage;
 
     /**
