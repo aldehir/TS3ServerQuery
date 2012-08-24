@@ -12,38 +12,59 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class TS3ServerDummy extends Thread {
-    private int port;
-    private ServerSocket serverSocket;
-    private TS3Writer writer;
-    private TS3Reader reader;
+    protected int port;
+    protected ServerSocket serverSocket;
+    protected TS3Writer writer;
+    protected TS3Reader reader;
 
-    private HashMap<Integer, Client> clients;
-    private HashSet<String> notifications;
+    protected Map<Integer, TS3Map> clients;
+    protected Set<String> notifications;
+
+    protected Random random;
+    protected SecureRandom secureRandom;
+
+    protected Semaphore semEventReceived;
+    protected Semaphore semEvents;
 
     public TS3ServerDummy(int port) {
         this.port = port;
 
-        Random random = new Random();
-        SecureRandom secureRandom = new SecureRandom();
+        random = new Random();
+        secureRandom = new SecureRandom();
 
         // Instantiate client map and create some fake clients
-        clients = new HashMap<Integer, Client>();
+        clients = Collections.synchronizedMap(new HashMap<Integer, TS3Map>());
         for(int i = 1; i <= 25; i++) {
-            Client client = new Client();
-            client.name = "client" + Integer.toString(i);
-            client.id = i;
-            client.uid = (new BigInteger(130, secureRandom)).toString(32);
-            client.channel = random.nextInt(10) + 1;
+            TS3Map client = createRandomClient(i);
 
-            clients.put(client.id, client);
-            System.out.println("Added client: " + client.toString());
+            clients.put(i, client);
         }
 
         // Instantiate the notifications set, which will contain all the
         // notifications that were registered
         notifications = new HashSet<String>();
+
+        // Initialize binary semaphores
+        semEventReceived = new Semaphore(0);
+        semEvents = new Semaphore(0);
+    }
+
+    protected TS3Map createRandomClient(int id) {
+        TS3Map client = new TS3Map();
+
+        client.add("clid", id);
+        client.add("client_nickname", "client" + Integer.toString(id));
+        client.add("client_unique_identifier", (new BigInteger(130,
+                secureRandom)).toString(32));
+        client.add("cid", random.nextInt(10) + 1);
+
+        return client;
     }
 
     public void run() {
@@ -69,6 +90,11 @@ public class TS3ServerDummy extends Thread {
         // Send in the first two lines, the welcome messages
         write("TS3");
         write("Hello world!");
+
+        // Spawn thread that makes changes to the client map to test the polling
+        // thread functionality
+        Thread t = new Thread(new ClientMapChanger(this));
+        t.start();
 
         // Listen for input
         String input;
@@ -103,9 +129,9 @@ public class TS3ServerDummy extends Thread {
     protected void command_clientlist(String cmd) throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        Iterator<Client> it = clients.values().iterator();
+        Iterator<TS3Map> it = clients.values().iterator();
         while(it.hasNext()) {
-            Client client = it.next();
+            TS3Map client = it.next();
             sb.append(client.toString());
             if(it.hasNext()) sb.append("|");
         }
@@ -134,7 +160,7 @@ public class TS3ServerDummy extends Thread {
 
     protected void write(String line) throws Exception {
         getWriter().writeLine(line);
-        System.out.println("Server: " + line);
+        // System.out.println("Server: " + line);
     }
 
     protected void writeError() throws Exception {
@@ -158,28 +184,58 @@ public class TS3ServerDummy extends Thread {
     }
 
     public boolean isClientInChannel(int id, int channel) {
-        Client client = clients.get(new Integer(id));
+        TS3Map client = clients.get(new Integer(id));
 
         if(client == null) return false;
-        return client.channel == channel;
+        return client.getInteger("cid").intValue() == channel;
     }
 
     public boolean isEventRegistered(String event) {
         return notifications.contains(event);
     }
 
-    /**
-     * Basic client structure
-     */
-    class Client {
-        String name;
-        int id;
-        String uid;
-        int channel;
+    private class ClientMapChanger implements Runnable {
+        TS3ServerDummy server;
 
-        public String toString() {
-            return String.format("clid=%d cid=%d client_nickname=%s client_unique_identifier=%s",
-                    id, channel, TS3Map.escape(name), uid);
+        public ClientMapChanger(TS3ServerDummy server) {
+            this.server = server;
+        }
+
+        public void run() {
+            try {
+                runChanger();
+            } catch(InterruptedException e) {
+                // blah
+            }
+        }
+
+        protected void runChanger() throws InterruptedException {
+            // Wait until the polling thread for the client starts up
+            Thread.sleep(1000);
+
+            // Remove a client from the map
+            server.clients.remove(1);
+            waitForResponse();
+
+            // Add in a new client
+            TS3Map client = server.createRandomClient(30);
+            server.clients.put(client.getInteger("clid"), client);
+            waitForResponse();
+
+            // Change the channel of a client
+            client = server.clients.get(2);
+            int channel = client.getInteger("cid").intValue();
+            client.remove("cid");
+            client.add("cid", channel + 1);
+            waitForResponse();
+
+            // Release semaphore for all events
+            semEvents.release();
+        }
+
+        protected void waitForResponse() throws InterruptedException {
+            // Wait until the event was received
+            assert semEventReceived.tryAcquire(5000, TimeUnit.MILLISECONDS);
         }
     }
 }
