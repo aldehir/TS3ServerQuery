@@ -145,7 +145,7 @@ public class TS3ServerQueryClient {
      * @throws InterruptedException
      * @throws IOException
      *
-     * @see #execute(TS3Command)
+     * @see #execute(String, TS3Map)
      */
     public TS3Result execute(String command)
             throws InterruptedException, IOException {
