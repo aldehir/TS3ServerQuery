@@ -179,7 +179,7 @@ public class TS3ServerQueryClient {
      *         specified command
      *
      * @throws InterruptedException
-     * @throws IOExeception
+     * @throws IOException
      *
      * @see #execute(String)
      */
