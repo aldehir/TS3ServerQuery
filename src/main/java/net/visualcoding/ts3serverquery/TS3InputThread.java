@@ -63,7 +63,7 @@ public class TS3InputThread extends Thread {
     }
 
     /**
-     * Executes the listening thread
+     * Executes the listening thread.
      */
     public void run() {
         // Instantiate a TS3 Reader object
