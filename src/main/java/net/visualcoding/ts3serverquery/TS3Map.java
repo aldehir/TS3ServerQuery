@@ -15,6 +15,39 @@ import java.util.HashMap;
  */
 public class TS3Map {
 
+    /** Mapping of characters to their escaped versions */
+    private static final Map<Integer, Integer> ESCAPE_CHARS;
+
+    /** Mapping of escaped characters to the actual charater */
+    private static final Map<Integer, Integer> UNESCAPE_CHARS;
+
+    // Initialization. Since the methods are all static, there is no
+    // instantiation of an object to perform the initialization. Instead,
+    // we perform it here and initialize the character maps.
+    static {
+        // Instantiate maps
+        ESCAPE_CHARS = new HashMap<Integer, Integer>(17);
+        UNESCAPE_CHARS = new HashMap<Integer, Integer>(17);
+
+        // Insert mappings to ESCAPE_CHARS
+        ESCAPE_CHARS.put(92, 92);
+        ESCAPE_CHARS.put(47, 47);
+        ESCAPE_CHARS.put(32, 115);
+        ESCAPE_CHARS.put(124, 112);
+        ESCAPE_CHARS.put(7, 97);
+        ESCAPE_CHARS.put(8, 98);
+        ESCAPE_CHARS.put(12, 102);
+        ESCAPE_CHARS.put(10, 110);
+        ESCAPE_CHARS.put(13, 114);
+        ESCAPE_CHARS.put(9, 116);
+        ESCAPE_CHARS.put(11, 118);
+
+        // Add a reflected mapping to UNESCAPE_CHARS
+        for(Map.Entry<Integer, Integer> entry : ESCAPE_CHARS.entrySet()) {
+            UNESCAPE_CHARS.put(entry.getValue(), entry.getKey());
+        }
+    }
+
     /**
      * Map containing the mapping of string keys to a list of string values.
      * By using a list, we are able to represent keys which contain multiple
@@ -371,7 +404,7 @@ public class TS3Map {
             if(name == null) name = nameValue[0];
 
             // Unescape the value and add to the list of values
-            values.add(TS3Util.unescape(nameValue[1]));
+            values.add(unescape(nameValue[1]));
         }
 
         // Return map entry
@@ -401,7 +434,7 @@ public class TS3Map {
         while(it.hasNext()) {
             sb.append(entry.getKey());
             sb.append('=');
-            sb.append(TS3Util.escape(it.next()));
+            sb.append(escape(it.next()));
 
             // Add a pipe if there are more values
             if(it.hasNext()) sb.append('|');
@@ -426,6 +459,70 @@ public class TS3Map {
 
             // Add space if there are more entries
             if(it.hasNext()) sb.append(' ');
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Escape {@code str} using the TS3 Server Query escape characters.
+     * @param str String to escape
+     * @return Escaped string
+     */
+    public static String escape(String str) {
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0; i < str.length(); ++i) {
+            // Get the character and it's integer object
+            char character = str.charAt(i);
+            Integer intval = Integer.valueOf((int)character);
+
+            // Check if we need to escape this character
+            if(ESCAPE_CHARS.containsKey(intval)) {
+                // Append a slash and the character
+                sb.append('\\');
+                sb.append((char)ESCAPE_CHARS.get(intval).intValue());
+            } else {
+                // Add character
+                sb.append(character);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Unescape {@code str} using the TS3 Server Query escape characters.
+     * @param str String to unescape
+     * @return Unescaped string
+     */
+    public static String unescape(String str) {
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0; i < str.length(); ++i) {
+            // Get the character
+            char character = str.charAt(i);
+
+            // Check if this is a backslash
+            if(character == '\\') {
+
+                // Ignore if the backspace isn't followed by at least
+                // one more character
+                if(i < str.length() - 1) {
+                    // Move and get the next character
+                    character = str.charAt(++i);
+                    Integer intval = Integer.valueOf((int)character);
+
+                    // Append the character
+                    if(UNESCAPE_CHARS.containsKey(intval)) {
+                        sb.append((char)UNESCAPE_CHARS.get(intval).intValue());
+                    }
+                }
+
+            } else {
+                // Add in character
+                sb.append(character);
+            }
         }
 
         return sb.toString();

@@ -16,10 +16,10 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 /**
  * TS3ServerQuery is a low-level interface for communicating with a Teamspeak 3
  * server through the Teamspeak 3 Server Query.
- * 
+ *
  * @author Aldehir Rojas
  * @version 1.0
- * 
+ *
  * @todo Implement handling of server and channel notifications, i.e. when
  *       the polling thread is not spawned.
  */
@@ -42,20 +42,20 @@ public class TS3ServerQueryClient {
 
     /** Teamspeak 3 Server Host */
     private String host;
-    
+
     /** Teamspeak 3 Server Port */
     private int port;
 
     /** Executor Service to handle event threads */
     private ExecutorService executorService;
-    
+
     /** Event listeners */
     private ArrayList<TS3EventListener> eventListeners;
-    
+
     /**
      * Constructor. Initialize this TS3ServerQueryClient with the Teamspeak 3
      * server host and default server query port, 10011.
-     * 
+     *
      * @param host Teamspeak 3 Server Host
      */
     public TS3ServerQueryClient(String host) {
@@ -118,7 +118,7 @@ public class TS3ServerQueryClient {
 
     /**
      * Connects to the TS3 Server through the Server Query interface.
-     * 
+     *
      * @throws UnknownHostException
      * @throws IOException
      */
@@ -128,7 +128,7 @@ public class TS3ServerQueryClient {
 
         // Create our input (listening) thread
         inputThread = new TS3InputThread(this, connection.getInputStream());
-        
+
         // Instantiate a writer object for sending output
         writer = new TS3Writer(new OutputStreamWriter(
                 connection.getOutputStream()));
@@ -139,12 +139,12 @@ public class TS3ServerQueryClient {
 
     /**
      * Executes a given command
-     * 
+     *
      * @param command Command to execute
      * @return TS3Result containing the response of the command
      * @throws InterruptedException
      * @throws IOException
-     * 
+     *
      * @see #execute(TS3Command)
      */
     public TS3Result execute(String command)
@@ -154,12 +154,12 @@ public class TS3ServerQueryClient {
         /* Only allow one command to execute at a time, this way we don't
          * receive a response that is intended for another command. */
         commandMutex.acquire();
-        
+
         // Send the command through our writer
         writer.write(command);
         writer.newLine();
         writer.flush();
-        
+
         // Wait for a response and enclose in a TS3Result object
         String[] response = inputThread.nextResponse();
         TS3Result result = new TS3Result(response);
@@ -177,13 +177,13 @@ public class TS3ServerQueryClient {
      * @param arguments Arguments to pass to to the command
      * @return {@code TS3Result} object containing the response of the
      *         specified command
-     * 
+     *
      * @throws InterruptedException
      * @throws IOExeception
-     * 
+     *
      * @see #execute(String)
      */
-    public TS3Result execute(String command, TS3Map arguments) 
+    public TS3Result execute(String command, TS3Map arguments)
             throws InterruptedException, IOException {
         if(arguments == null || arguments.isEmpty())
             return execute(command);
@@ -194,14 +194,14 @@ public class TS3ServerQueryClient {
      * Registers the TS3 notifications for receiving text messages and basic
      * user notifications. This is the equivalent to calling
      * {@code registerNotifications(true)}.
-     * 
+     *
      * @return True if all the notifications were successfully registered.
      * @see #registerNotifications(boolean)
      */
     public boolean registerNotifications() {
         return registerNotifications(true);
     }
-    
+
     /**
      * Registers the TS3 notifications for receiving text messages and basic
      * user notifications. This method is a convenience method for registering
@@ -219,19 +219,19 @@ public class TS3ServerQueryClient {
      * <p>
      * If {@code usePolling} is false, then the default "server" and "channel"
      * notifications are registered in place of the polling thread.
-     * 
+     *
      * @param usePolling Whether or not to spawn a polling thread
      * @return True if all the notifications were successfully registered.
      */
     public boolean registerNotifications(boolean usePolling) {
         boolean allSuccessful = true;
-        
+
         // Add in the events for text messages
         ArrayList<String> events = new ArrayList<String>(5);
         events.add("textserver");
         events.add("textchannel");
         events.add("textprivate");
-        
+
         // If we're not using polling, then register the server and channel
         // notifications
         if(!usePolling) {
@@ -246,18 +246,18 @@ public class TS3ServerQueryClient {
 
             try {
                 TS3Result result;
-                
+
                 // Handle the channel event differently
                 if(event.equalsIgnoreCase("channel")) {
                     // Get our current channel id by calling "whoami"
                     result = execute("whoami");
                     String channelId = result.getFirst()
                             .get("client_channel_id");
-                    
+
                     // Add in the id to the command arguments
                     arguments.add("id", channelId);
                 }
-                
+
                 // Execute the command
                 result = execute("servernotifyregister", arguments);
                 if(result.hasError()) allSuccessful = false;
@@ -282,26 +282,22 @@ public class TS3ServerQueryClient {
     protected void notify(String notification) {
         // Split into the notification type and it's values
         String[] parts = notification.split("\\s+", 2);
-        Map<String, String> values = TS3Util.parseDetails(parts[1]);
+        TS3Map map = new TS3Map(parts[1]);
 
-        try {
-            if(parts[0].equalsIgnoreCase("notifytextmessage")) {
-                int id = Integer.parseInt(values.get("invokerid"));
-                int mode = Integer.parseInt(values.get("targetmode"));
+        if(parts[0].equalsIgnoreCase("notifytextmessage")) {
+            int id = map.getInteger("invokerid").intValue();
+            int mode = map.getInteger("targetmode").intValue();
 
-                TS3MessageEvent event = new TS3MessageEvent(
-                    values.get("invokername"),
-                    id,
-                    values.get("invokeruid")
-                );
+            TS3MessageEvent event = new TS3MessageEvent(
+                map.get("invokername"),
+                id,
+                map.get("invokeruid")
+            );
 
-                event.setMode(mode);
-                event.setMessage(values.get("msg"));
+            event.setMode(mode);
+            event.setMessage(map.get("msg"));
 
-                notify(event);
-            }
-        } catch(Exception e) {
-            // ...
+            notify(event);
         }
     }
 
