@@ -15,10 +15,10 @@ import java.util.HashMap;
  */
 public class TS3Map {
 
-    /** Mapping of characters to their escaped versions */
+    /** Mapping of characters to their escaped versions. */
     private static final Map<Integer, Integer> ESCAPE_CHARS;
 
-    /** Mapping of escaped characters to the actual charater */
+    /** Mapping of escaped characters to the actual charater. */
     private static final Map<Integer, Integer> UNESCAPE_CHARS;
 
     // Initialization. Since the methods are all static, there is no
@@ -230,7 +230,7 @@ public class TS3Map {
 
     /**
      * Returns the size of this map.
-     * @returns the size of this map
+     * @return the size of this map
      */
     public int size() {
         return map.size();
@@ -306,6 +306,7 @@ public class TS3Map {
 
     /**
      * Returns {@code true} if this map contains {@code key}.
+     * @param key key to check whether or not it exists in this map
      * @return {@code true} if this map contains {@code key}
      */
     public boolean contains(String key) {
@@ -314,6 +315,7 @@ public class TS3Map {
 
     /**
      * Removes the mapping of the specified key in this map.
+     * @param key key to remove from this map
      * @return {@code true} if the key exists and was removed
      */
     public boolean remove(String key) {
@@ -413,6 +415,7 @@ public class TS3Map {
 
     /**
      * Returns a string representation of a Map.Entry object.
+     * @param entry entry to represent as a string
      * @return a string representation of a Map.Entry object.
      */
     protected String entryToString(Map.Entry<String, List<String>> entry) {
