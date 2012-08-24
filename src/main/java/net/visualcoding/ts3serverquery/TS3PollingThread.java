@@ -56,7 +56,7 @@ public class TS3PollingThread extends Thread {
     /**
      * Constructs the thread with the specified server query client and polling
      * latency.
-     * 
+     *
      * @param serverQuery server query client that is to be notified of events
      * @param latency     time in milliseconds between polls
      */
@@ -189,7 +189,7 @@ public class TS3PollingThread extends Thread {
     protected class ClientInfo {
         /** Name of the client. */
         protected String clientName;
-        
+
         /** Id of the client. */
         protected int clientId;
 
@@ -215,7 +215,8 @@ public class TS3PollingThread extends Thread {
          * @param clientUid  unique id of the client
          * @param channelId  channel id of the channel the client is in
          */
-        public ClientInfo(String clientName, int clientId, String clientUid, int channelId) {
+        public ClientInfo(String clientName, int clientId, String clientUid,
+                int channelId) {
             this.clientName = clientName;
             this.clientId = clientId;
             this.clientUid = clientUid;
