@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Unit test for TS3Map
  */
 public class TS3MapTest extends TestCase {
-    
+
     /**
      * Create the test case
      *
@@ -49,7 +49,7 @@ public class TS3MapTest extends TestCase {
         assertEquals(entry.getValue().size(), 4);
         String[] values = {"val1", "val2", "val3", "val4"};
         for(String value : values) assertTrue(entry.getValue().contains(value));
-        
+
         entry = map.parseMapEntry("-switch");
         assertEquals(entry.getKey(), "switch");
         assertNull(entry.getValue());
@@ -92,11 +92,11 @@ public class TS3MapTest extends TestCase {
         assertEquals(map.toString(), "entry=v1|entry=v2|entry=v3");
 
         map.clear();
-        map.addInteger("client_id", 1);
+        map.add("client_id", 1);
         assertEquals(map.toString(), "client_id=1");
 
         map.clear();
-        map.addSwitch("uids");
+        map.add("uids");
         assertEquals(map.toString(), "-uids");
 
         // Test the get methods
@@ -138,7 +138,7 @@ public class TS3MapTest extends TestCase {
 
         // Test integers
         map.add("int", "123");
-        map.addInteger("int2", 1234);
+        map.add("int2", 1234);
         assertTrue(map.isInteger("int"));
         assertTrue(map.isInteger("int2"));
 
@@ -150,13 +150,13 @@ public class TS3MapTest extends TestCase {
 
         // Test integer lists
         Integer[] intVals = new Integer[] { 1, 2, 3, 4 };
-        for(Integer val : intVals) map.addInteger("intList", val);
+        for(Integer val : intVals) map.add("intList", val);
 
         assertTrue(map.isList("intList"));
         assertEquals(map.getIntegerList("intList"), Arrays.asList(intVals));
 
         // Test switches
-        map.addSwitch("switch");
+        map.add("switch");
         assertTrue(map.isSwitch("switch"));
         assertFalse(map.isList("switch"));
         assertFalse(map.isInteger("switch"));

@@ -6,7 +6,7 @@ import net.visualcoding.ts3serverquery.event.TS3ClientMovedEvent;
 import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 
 public class TS3ServerQueryClientExample {
-    
+
     public static void main(String[] args) throws Exception {
         TS3ServerQueryClient q = new TS3ServerQueryClient("localhost");
         q.connect();
@@ -17,7 +17,7 @@ public class TS3ServerQueryClientExample {
 
         // Command: use sid=1
         TS3Map useArgs = new TS3Map();
-        useArgs.addInteger("sid", 1);
+        useArgs.add("sid", 1);
         result = q.execute("use", useArgs);
         System.out.println(result);
 

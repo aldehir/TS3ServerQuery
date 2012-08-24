@@ -111,22 +111,22 @@
 
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
-        <module name="ModifierOrder"/>
-        <module name="RedundantModifier"/>
+        <!-- <module name="ModifierOrder"/>                     -->
+        <!-- <module name="RedundantModifier"/>                 -->
 
 
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
-        <module name="AvoidNestedBlocks"/>
+        <!-- <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
-        <module name="RightCurly"/>
+        <module name="RightCurly"/>                          -->
 
 
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <module name="AvoidInlineConditionals"/>
+        <!-- <module name="AvoidInlineConditionals"/>        -->
         <module name="DoubleCheckedLocking"/>    <!-- MY FAVOURITE -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
@@ -141,17 +141,17 @@
 
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
-        <module name="DesignForExtension"/>
+        <!-- <module name="DesignForExtension"/>
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
-        <module name="InterfaceIsType"/>
+        <module name="InterfaceIsType"/>                     -->
         <module name="VisibilityModifier"/>
 
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
-        <module name="FinalParameters"/>
+        <!-- <module name="FinalParameters"/>              -->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 

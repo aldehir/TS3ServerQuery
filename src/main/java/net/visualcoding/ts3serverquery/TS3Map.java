@@ -1,18 +1,15 @@
 package net.visualcoding.ts3serverquery;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.lang.StringBuilder;
 
 /**
  * This class provides a map structure suitable for TS3 Server Query queries.
- * 
+ *
  * @author Aldehir Rojas
  * @version 1.0
  */
@@ -26,12 +23,13 @@ public class TS3Map {
      * {@code
      * client_id=1|client_id=2|client_id=3
      * }
+     * </pre>
      * <p>
      * Keys associated with a null value or an empty list is interpretted as
      * a switch.
      */
     private Map<String, List<String>> map;
-   
+
     /**
      * Constructs an empty map.
      */
@@ -54,7 +52,7 @@ public class TS3Map {
     /**
      * Returns the {@code String} object to which the specified key is mapped,
      * or null if this map contains no mapping for the key.
-     * 
+     *
      * @param key the key whose associated value is to be returned
      * @return the {@code String} object to which the specified key is mapped,
      *         or null if this map contains no mapping for the key
@@ -142,12 +140,14 @@ public class TS3Map {
     /**
      * Returns {@code true} if this map contains {@code key} and the value of
      * {@code key} is a list.
+     *
+     * @param key key to check to see if associated value is a list
      * @return {@code true} if this map contains {@code key} and the value of
      *         {@code key} is a list
      */
     public boolean isList(String key) {
         List<String> list = map.get(key);
-        
+
         // Only consider it a list if it has more than 1 item
         if(list == null || list.size() <= 1) return false;
         return true;
@@ -156,6 +156,8 @@ public class TS3Map {
     /**
      * Returns {@code true} if this map contains {@code key} and the value of
      * {@code key} is an integer.
+     *
+     * @param key key to check to see if associated value is an integer
      * @return {@code true} if this map contains {@code key} and the value of
      *         {@code key} is an integer
      */
@@ -176,6 +178,8 @@ public class TS3Map {
     /**
      * Returns {@code true} if this map contains {@code key} and {@code key} is
      * a switch.
+     *
+     * @param key key to check if associated value is a switch
      * @return {@code true} if this map contains {@code key} and {@code key} is
      *         a switch
      */
@@ -203,7 +207,7 @@ public class TS3Map {
      * Associates the specified value with the specified key in this map. If
      * the map already contains the specified key, then the specified value is
      * appended to the list associated with the specified key.
-     * 
+     *
      * @param key   key with which the specified value is to be associated
      * @param value value to be associated with the specified key
      * @return {@code true} if the mapping was successfully added
@@ -215,7 +219,7 @@ public class TS3Map {
 
         // Don't add if the key or value variables are empty
         if(key.isEmpty() || value.isEmpty()) return false;
-        
+
         // Get the list of the given key
         List<String> list = map.get(key);
 
@@ -235,13 +239,13 @@ public class TS3Map {
     /**
      * Associates the specified integer value with the specified key in this
      * map. If the map already contains the specified key, then the specified
-     * value is appended to the list associated with the specified key.
+     * value is append to the list associated with the specified key.
      *
-     * @param key   key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
+     * @param key     key with which the sepcified value is to be associated
+     * @param integer integer to be assocaited with the specified key
      * @return {@code true} if the mapping was successfully added
      */
-    public boolean addInteger(String key, int integer) {
+    public boolean add(String key, int integer) {
         return add(key, Integer.toString(integer));
     }
 
@@ -253,7 +257,7 @@ public class TS3Map {
      *         {@code false} if the map already contains the specified key
      *         and is not a switch.
      */
-    public boolean addSwitch(String key) {
+    public boolean add(String key) {
         List<String> value = map.get(key);
 
         // If there is no mapping, or if the value is null then
@@ -297,7 +301,7 @@ public class TS3Map {
 
     /**
      * Parses the specified string representation of a TS3Map.
-     * 
+     *
      * @param mapString String representation of a TS3Map
      * @return Internal map object used by TS3Map containing the mappings in the
      *         specified string.
@@ -322,7 +326,7 @@ public class TS3Map {
 
     /**
      * Parses the specified string representation of an entry in a TS3Map.
-     * 
+     *
      * @param entry String representation of an entry for TS3Map
      * @return A Map.Entry object containing the parsed contents of the
      *         specified string.
