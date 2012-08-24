@@ -48,7 +48,7 @@ public class TS3Reader extends BufferedReader {
     public String readLine() throws IOException {
         // Read in the line (up to the linefeed)
         String line = super.readLine();
-        
+
         // If the line is not null (i.e. not the end of the stream),
         // then skip the next character, which will undoubtedly be
         // a carriage return.
