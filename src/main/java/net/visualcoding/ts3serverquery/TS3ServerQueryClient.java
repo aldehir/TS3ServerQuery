@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.visualcoding.ts3serverquery.event.TS3Event;
 import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 
@@ -51,6 +54,10 @@ public class TS3ServerQueryClient {
     /** Event listeners. */
     private ArrayList<TS3EventListener> eventListeners;
 
+    /** Logger */
+    private final Logger logger = LoggerFactory.getLogger(
+            TS3ServerQueryClient.class);
+
     /**
      * Constructor. Initialize this TS3ServerQueryClient with the Teamspeak 3
      * server host and default server query port, 10011.
@@ -84,7 +91,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Get the Teamspeak 3 Server Host.
+     * Returns the Teamspeak 3 Server Host.
      * @return Teamspeak 3 Server Host
      */
     public String getHost() {
@@ -92,7 +99,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Get the Teamspeak 3 Server Port.
+     * Returns the Teamspeak 3 Server Port.
      * @return Teamspeak 3 Server Port
      */
     public int getPort() {
@@ -100,7 +107,15 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Set the Teamspeak 3 Server Host.
+     * Returns the Logger object used by this query client.
+     * @return the Logger object used by this query client.
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Sets the Teamspeak 3 Server Host.
      * @param host Teamspeak 3 Server Host
      */
     public void setHost(String host) {
@@ -108,7 +123,7 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Set the Teamspeak 3 Server Port.
+     * Sets the Teamspeak 3 Server Port.
      * @param port Teamspeak 3 Server Port
      */
     public void setPort(int port) {
@@ -134,6 +149,8 @@ public class TS3ServerQueryClient {
     public void  connect() throws UnknownHostException, IOException {
         // Open up a connection to the TS3 Server Query (telnet)
         connection = new Socket(host, port);
+
+        getLogger().info("Connected to " + host + ":" + port);
 
         // Create our input (listening) thread
         inputThread = new TS3InputThread(this, connection.getInputStream());
