@@ -54,7 +54,10 @@ public class TS3ServerQueryClient {
     /** Event listeners. */
     private ArrayList<TS3EventListener> eventListeners;
 
-    /** Logger */
+    /**
+     * Logger. Use the SLF4J API because it allows the application implementing
+     * this client to use whichever logging library it wishes.
+     */
     private final Logger logger = LoggerFactory.getLogger(
             TS3ServerQueryClient.class);
 
