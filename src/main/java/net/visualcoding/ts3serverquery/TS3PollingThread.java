@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+
 /**
  * This thread polls the TS3 server to find newly connected clients,
  * disconnected clients, and clients that have moved channels.
@@ -67,6 +69,8 @@ public class TS3PollingThread extends Thread {
      * Polling thread execution.
      */
     public void run() {
+        serverQuery.getLogger().info("Polling thread spawned");
+
         try {
 
             // Loop indefinitely inside the try-catch so the thread terminates
@@ -88,12 +92,12 @@ public class TS3PollingThread extends Thread {
             }
 
         } catch(IOException e) {
-            /** @todo Implement */
-            System.err.println("IO Exception");
+            serverQuery.getLogger().debug("Unable to read from socket");
         } catch(InterruptedException e) {
-            /** @todo Implement */
-            System.err.println("Interruped Exception");
+            serverQuery.getLogger().debug("Polling thread interrupted");
         }
+
+        serverQuery.getLogger().info("Polling thread terminated");
     }
 
     /**

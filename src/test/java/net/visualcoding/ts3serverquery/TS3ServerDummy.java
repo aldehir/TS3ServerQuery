@@ -115,8 +115,6 @@ public class TS3ServerDummy extends Thread {
             // Split by whitespace
             String[] split = input.split("\\s+", 2);
 
-            System.out.println("Client: " + input);
-
             // We're going to do something nasty here, but just for convenience
             Class<?> c = getClass();
 
@@ -184,7 +182,6 @@ public class TS3ServerDummy extends Thread {
 
     protected void write(String line) throws Exception {
         getWriter().writeLine(line);
-        // System.out.println("Server: " + line);
     }
 
     protected void writeError() throws Exception {

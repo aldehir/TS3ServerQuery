@@ -1,5 +1,6 @@
 package net.visualcoding.ts3serverquery;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
@@ -66,6 +67,8 @@ public class TS3InputThread extends Thread {
      * Executes the listening thread.
      */
     public void run() {
+        serverQuery.getLogger().info("Input thread spawned");
+
         // Instantiate a TS3 Reader object
         TS3Reader reader = new TS3Reader(new InputStreamReader(stream));
 
@@ -84,12 +87,21 @@ public class TS3InputThread extends Thread {
                     // Add input to our queue, blocking if full
                     queue.put(input);
                 }
+
+                // Break out of our loop if we were interrupted
+                if(interrupted()) {
+                    serverQuery.getLogger().debug(
+                            "Input thread interrupted");
+                    break;
+                }
             }
-        } catch(Exception e) {
-            e.printStackTrace();
-        } finally {
-            try { reader.close(); } catch(Exception e) { }
+        } catch(IOException e) {
+            serverQuery.getLogger().debug("Unable to read from socket");
+        } catch(InterruptedException e) {
+            serverQuery.getLogger().debug("Input thread interrupted");
         }
+
+        serverQuery.getLogger().info("Input thread terminated");
     }
 
     /**

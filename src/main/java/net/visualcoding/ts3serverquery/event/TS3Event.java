@@ -90,6 +90,12 @@ abstract public class TS3Event {
         this.clientUid = clientUid;
     }
 
+    public String toString() {
+        return String.format("Event: %s, Client: %s, ID: %d, UID: %s",
+                this.getClass().getSimpleName(), getClientName(), getClientId(),
+                getClientUid());
+    }
+
     /**
      * Calls the appropriate method in the specified event listener. TS3Event
      * subclasses must implement this method in order for the events to be

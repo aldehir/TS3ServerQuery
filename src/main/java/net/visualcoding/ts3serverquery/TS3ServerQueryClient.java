@@ -146,14 +146,18 @@ public class TS3ServerQueryClient {
     /**
      * Connects to the TS3 Server through the Server Query interface.
      *
-     * @throws UnknownHostException
      * @throws IOException
      */
-    public void  connect() throws UnknownHostException, IOException {
-        // Open up a connection to the TS3 Server Query (telnet)
-        connection = new Socket(host, port);
+    public void connect() throws IOException {
+        try {
+            // Open up a connection to the TS3 Server Query (telnet)
+            connection = new Socket(host, port);
+        } catch(IOException e) {
+            logger.info("Unable to establish connection to {}:{}", host,port);
+            throw e;
+        }
 
-        getLogger().info("Connected to " + host + ":" + port);
+        logger.info("Connected to {}:{}", host, port);
 
         // Create our input (listening) thread
         inputThread = new TS3InputThread(this, connection.getInputStream());
@@ -185,13 +189,16 @@ public class TS3ServerQueryClient {
         commandMutex.acquire();
 
         // Send the command through our writer
-        writer.write(command);
-        writer.newLine();
-        writer.flush();
+        writer.writeLine(command);
+
+        logger.debug("Sent: {}", command);
 
         // Wait for a response and enclose in a TS3Result object
         String[] response = inputThread.nextResponse();
         TS3Result result = new TS3Result(response);
+
+        logger.debug("Recv: {} ({})", result.getErrorMessage(),
+                result.getErrorCode());
 
         // Allow other commands to execute
         commandMutex.release();
@@ -335,6 +342,8 @@ public class TS3ServerQueryClient {
      * @param event TS3Event to send to the event listeners.
      */
     protected void notify(final TS3Event event) {
+        logger.debug(event.toString());
+
         // Don't spawn a thread if we have no event listeners
         synchronized(eventListeners) {
            if(eventListeners.size() == 0) return;

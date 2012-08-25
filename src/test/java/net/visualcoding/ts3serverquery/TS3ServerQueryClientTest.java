@@ -77,8 +77,6 @@ public class TS3ServerQueryClientTest {
         }
 
         public void onClientMoved(TS3ClientMovedEvent event) {
-            System.out.println("Client moved: " + event.getClientName());
-
             // Check the server if the client is in the channel
             assertTrue(server.isClientInChannel(event.getClientId(),
                     event.getDestination()));
@@ -87,8 +85,6 @@ public class TS3ServerQueryClientTest {
         }
 
         public void onClientConnected(TS3ClientConnectedEvent event) {
-            System.out.println("Client connected: " + event.getClientName());
-
             // Check that the server contains the client
             assertTrue(server.hasClient(event.getClientId()));
 
@@ -96,8 +92,6 @@ public class TS3ServerQueryClientTest {
         }
 
         public void onClientDisconnected(TS3ClientDisconnectedEvent event) {
-            System.out.println("Client disconnected: " + event.getClientName());
-
             // Check that the server does not contain the client
             assertFalse(server.hasClient(event.getClientId()));
 
@@ -105,7 +99,6 @@ public class TS3ServerQueryClientTest {
         }
 
         public void onMessage(TS3MessageEvent event) {
-            System.out.println("Message received:" + event.getMessage() + " of mode " + event.getMode().getValue());
             server.semMsgReceived.release();
         }
 
