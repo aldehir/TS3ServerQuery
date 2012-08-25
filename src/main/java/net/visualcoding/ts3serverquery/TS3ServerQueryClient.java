@@ -28,16 +28,16 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
 public class TS3ServerQueryClient {
 
     /** Socket connection to the TS3 server. */
-    private Socket connection;
+    private Socket connection = null;
 
     /** Input thread. */
-    private TS3InputThread inputThread;
+    private TS3InputThread inputThread = null;
 
     /** Writer object for sending commands. */
-    private TS3Writer writer;
+    private TS3Writer writer = null;
 
     /** Polling thread. */
-    private TS3PollingThread pollingThread;
+    private TS3PollingThread pollingThread = null;
 
     /** Semaphore to ensure that only one command is sent at a time. */
     private Semaphore commandMutex;
@@ -159,15 +159,35 @@ public class TS3ServerQueryClient {
 
         logger.info("Connected to {}:{}", host, port);
 
-        // Create our input (listening) thread
-        inputThread = new TS3InputThread(this, connection.getInputStream());
-
         // Instantiate a writer object for sending output
         writer = new TS3Writer(new OutputStreamWriter(
                 connection.getOutputStream()));
 
+        // Create our input (listening) thread
+        inputThread = new TS3InputThread(this, connection.getInputStream());
+
         // Start up the listening thread
         inputThread.start();
+    }
+
+    /**
+     * Disconnects from the TS3 Server.
+     */
+    public void disconnect() throws IOException {
+        // Close our socket, the threads will respond
+        // to the thrown SocketException by terminating themselves
+        if(connection != null) connection.close();
+        connection = null;
+
+        // Wait for our threads to finish terminating
+        try {
+            if(inputThread != null) inputThread.join();
+            if(pollingThread != null) pollingThread.join();
+        } catch(InterruptedException e) {
+            logger.warn("Interrupted before threads finished");
+        }
+
+        logger.info("Disconnected from server");
     }
 
     /**

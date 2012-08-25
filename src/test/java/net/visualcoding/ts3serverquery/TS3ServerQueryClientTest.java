@@ -19,7 +19,7 @@ public class TS3ServerQueryClientTest {
         client.connect();
     }
 
-    @Test
+    @Test(timeout=10000)
     public void testServerQueryClient() {
 
         final int port = 14512;
@@ -61,6 +61,9 @@ public class TS3ServerQueryClientTest {
 
             // Wait until all messages are processed before terminating
             assertTrue(server.semMessages.tryAcquire(10, TimeUnit.SECONDS));
+
+            // Disconnect from the server
+            client.disconnect();
         } catch(Exception e) {
             e.printStackTrace();
             fail();
