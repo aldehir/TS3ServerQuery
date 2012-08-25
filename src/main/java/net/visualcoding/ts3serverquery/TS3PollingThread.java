@@ -6,8 +6,6 @@ import net.visualcoding.ts3serverquery.event.TS3ClientDisconnectedEvent;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.io.IOException;
 
 /**
