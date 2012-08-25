@@ -24,7 +24,7 @@ Or, you can install it to your local maven repository
 
     $ mvn install
 
-and specify the package as a dependency in your own maven projects
+and add the package as a dependency in your own maven projects
 
 ```xml
 <dependency>
@@ -34,9 +34,9 @@ and specify the package as a dependency in your own maven projects
 </dependency>
 ```
 
-### Dependencies
+## Dependencies
 
-TS3ServerQuery uses [SLF4J][slf4j] so applications implementing TS3ServerQuery
+[SLF4J][slf4j] is used so applications implementing TS3ServerQuery
 can use the logging library of their choice.
 
 ## Documentation
