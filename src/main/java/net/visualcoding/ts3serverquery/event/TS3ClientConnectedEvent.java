@@ -24,6 +24,7 @@ public class TS3ClientConnectedEvent extends TS3Event {
 
     /**
      * Calls {@link TS3EventListener#onClientConnected()} and passes this event
+     * @param listener event listener to receive this event
      */
     public void execute(TS3EventListener listener) {
         listener.onClientConnected(this);
