@@ -2,37 +2,26 @@ package net.visualcoding.ts3serverquery;
 
 import net.visualcoding.ts3serverquery.event.*;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 /**
  * Unit test for TS3ServerQuery
  */
-public class TS3ServerQueryClientTest extends TestCase {
+public class TS3ServerQueryClientTest {
 
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public TS3ServerQueryClientTest(String testName) {
-        super( testName );
+    @Test(expected=IOException.class)
+    public void testFailedConnection() throws IOException {
+        TS3ServerQueryClient client = new TS3ServerQueryClient("unkownhost", 5123);
+        client.connect();
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite() {
-        return new TestSuite(TS3ServerQueryClientTest.class);
-    }
+    @Test
+    public void testServerQueryClient() {
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp() {
         final int port = 14512;
 
         // Create a server dummy, execute on it's own thread
@@ -74,7 +63,7 @@ public class TS3ServerQueryClientTest extends TestCase {
             assertTrue(server.semMessages.tryAcquire(10, TimeUnit.SECONDS));
         } catch(Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
         assertTrue( true );
