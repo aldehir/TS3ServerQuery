@@ -112,7 +112,8 @@ public class TS3MessageEvent extends TS3Event {
     }
 
     /**
-     * Calls {@link TS3EventListener#onMessage()} and passes this message event.
+     * Calls {@link TS3EventListener#onMessage(TS3MessageEvent)} and passes
+     * this message event.
      * @param listener event listener to receive this event
      */
     public void execute(TS3EventListener listener) {
