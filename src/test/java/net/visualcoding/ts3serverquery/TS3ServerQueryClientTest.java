@@ -13,11 +13,13 @@ import java.io.IOException;
  */
 public class TS3ServerQueryClientTest {
 
+    /*
     @Test(expected=IOException.class)
     public void testFailedConnection() throws IOException {
         TS3ServerQueryClient client = new TS3ServerQueryClient("unkownhost", 5123);
         client.connect();
     }
+    */
 
     @Test(timeout=10000)
     public void testServerQueryClient() {
