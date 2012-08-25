@@ -7,7 +7,7 @@ Teamspeak 3 Server Query.
 
 ### Jar Package
 
-[TS3ServerQuery-1.0-SNAPSHOT.jar][snapshot] is available for download.
+[TS3ServerQuery-1.0-SNAPSHOT.jar][snapshot]
 
 ### Cloning from git
 
