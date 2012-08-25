@@ -166,16 +166,11 @@ public class TS3PollingThread extends Thread {
                 // Check if the client moved channels
                 if(client.channelId != previous.channelId) {
 
-                    // Create the event object
-                    TS3ClientMovedEvent event = new TS3ClientMovedEvent(
-                            client.clientName, client.clientId,
-                            client.clientUid);
-
-                    event.setSource(previous.channelId);
-                    event.setDestination(client.channelId);
-
                     // Send notification
-                    serverQuery.notify(event);
+                    serverQuery.notify(new TS3ClientMovedEvent(
+                            client.clientName, client.clientId,
+                            client.clientUid, previous.channelId,
+                            client.channelId));
                 }
             }
         }
