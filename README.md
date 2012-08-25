@@ -42,12 +42,11 @@ can use the logging library of their choice.
 ## Usage
 
 `TS3ServerQueryClient` acts much like a simple telnet client. However, it also
-adds the handling of notifications. Below is a simple usage of the client, minus
-the try-catch statements required.
+adds the handling of notifications. Below is basic usage of the client, minus
+exception handling for the sake of simplicity.
 
 ```java
-TS3ServerQueryClient client =
-        new TS3ServerQueryClient("localhost", 10011);
+TS3ServerQueryClient client = new TS3ServerQueryClient("localhost", 10011);
 
 // Connect to the server
 client.connect();
