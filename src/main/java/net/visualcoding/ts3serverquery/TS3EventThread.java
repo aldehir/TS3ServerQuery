@@ -40,6 +40,8 @@ public class TS3EventThread extends Thread {
     /**
      * Constructs an event thread with a queue size of {@value
      * DEFAULT_QUEUE_SIZE}.
+     *
+     * @param client Server query client that spawns this thread.
      */
     public TS3EventThread(TS3ServerQueryClient client) {
         this(client, DEFAULT_QUEUE_SIZE);
@@ -47,6 +49,8 @@ public class TS3EventThread extends Thread {
 
     /**
      * Constructs an event thread with the specified queue size.
+     *
+     * @param client Server query client that spawns this thread.
      * @param queueSize size of the bounded blocking queue used to store events
      */
     public TS3EventThread(TS3ServerQueryClient client, int queueSize) {
