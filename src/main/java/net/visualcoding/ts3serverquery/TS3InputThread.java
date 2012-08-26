@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * associated instance of a {@link TS3ServerQueryClient} object.
  * <p>
  * It also manages notifications by calling
- * {@link TS3ServerQueryClient#notify(String)} upon notification. In addition,
+ * {@link TS3EventThread#notify(String)} upon notification. In addition,
  * this class provides the {@link #nextResponse()} method to wait for the
  * Teamspeak 3 Server to send a response after receiving a command.
  *
@@ -81,7 +81,7 @@ public class TS3InputThread extends Thread {
             while((input = reader.readLine()) != null) {
                 if(input.startsWith("notify")) {
                     // Send to the server query to handle notification
-                    serverQuery.notify(input);
+                    serverQuery.getEventThread().notify(input);
                     continue;
                 } else {
                     // Add input to our queue, blocking if full

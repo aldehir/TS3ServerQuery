@@ -39,6 +39,9 @@ public class TS3ServerQueryClient {
     /** Polling thread. */
     private TS3PollingThread pollingThread = null;
 
+    /** Event thread. */
+    private TS3EventThread eventThread = null;
+
     /** Semaphore to ensure that only one command is sent at a time. */
     private Semaphore commandMutex;
 
@@ -47,12 +50,6 @@ public class TS3ServerQueryClient {
 
     /** Teamspeak 3 Server Port. */
     private int port;
-
-    /** Executor Service to handle event threads. */
-    private ExecutorService executorService;
-
-    /** Event listeners. */
-    private ArrayList<TS3EventListener> eventListeners;
 
     /**
      * Logger. Use the SLF4J API because it allows the application implementing
@@ -86,11 +83,9 @@ public class TS3ServerQueryClient {
         // Initialize semaphores/mutexes
         commandMutex = new Semaphore(1);
 
-        // Instantiate our list of event listeners
-        eventListeners = new ArrayList<TS3EventListener>();
-
-        // Create the executor service used to manage threads for notifications
-        executorService = Executors.newCachedThreadPool();
+        // Construct an event thread, but don't start. This way we can add
+        // listeners before registering for notifications.
+        eventThread = new TS3EventThread(this);
     }
 
     /**
@@ -118,6 +113,14 @@ public class TS3ServerQueryClient {
     }
 
     /**
+     * Returns the event thread object used to handle event notifications.
+     * @return the event thread object used to handle event notifications.
+     */
+    protected TS3EventThread getEventThread() {
+        return eventThread;
+    }
+
+    /**
      * Sets the Teamspeak 3 Server Host.
      * @param host Teamspeak 3 Server Host
      */
@@ -134,13 +137,19 @@ public class TS3ServerQueryClient {
     }
 
     /**
-     * Add an event listener.
+     * Add the specified event listener to receive event notifications.
      * @param listener Listener to add
      */
     public void addEventListener(TS3EventListener listener) {
-        synchronized(eventListeners) {
-            eventListeners.add(listener);
-        }
+        getEventThread().addListener(listener);
+    }
+
+    /**
+     * Removes the specified event listener.
+     * @param listener Listener to remove
+     */
+    public void removeEventListener(TS3EventListener listener) {
+        getEventThread().removeListener(listener);
     }
 
     /**
@@ -328,59 +337,10 @@ public class TS3ServerQueryClient {
             pollingThread.start();
         }
 
+        // Start the event thread
+        eventThread.start();
+
         return allSuccessful;
     }
 
-    /**
-     * Notify the event listeners that an event has occurred.
-     * @param notification Raw notification string from the TS3 Server Query.
-     */
-    protected void notify(String notification) {
-        // Split into the notification type and it's values
-        String[] parts = notification.split("\\s+", 2);
-        TS3Map map = new TS3Map(parts[1]);
-
-        if(parts[0].equalsIgnoreCase("notifytextmessage")) {
-            int id = map.getInteger("invokerid").intValue();
-            int mode = map.getInteger("targetmode").intValue();
-
-            TS3MessageEvent event = new TS3MessageEvent(
-                map.get("invokername"),
-                id,
-                map.get("invokeruid")
-            );
-
-            event.setMode(mode);
-            event.setMessage(map.get("msg"));
-
-            notify(event);
-        }
-    }
-
-    /**
-     * Notify the event listeners that an event has occurred.
-     * @param event TS3Event to send to the event listeners.
-     */
-    protected void notify(final TS3Event event) {
-        logger.debug(event.toString());
-
-        // Don't spawn a thread if we have no event listeners
-        synchronized(eventListeners) {
-           if(eventListeners.size() == 0) return;
-        }
-
-        // Create a runnable object to execute the event on all listeners
-        Runnable task = new Runnable() {
-            public void run() {
-                synchronized(eventListeners) {
-                    for(TS3EventListener listener : eventListeners) {
-                        event.execute(listener);
-                    }
-                }
-            }
-        };
-
-       // Now submit our runnable to our executor service
-       executorService.submit(task);
-    }
 }

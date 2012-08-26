@@ -150,8 +150,9 @@ public class TS3PollingThread extends Thread {
             // Send an event notification if the client does not exist in the
             // map of currently connected clients
             if(!connectedClients.containsKey(client.clientId)) {
-                serverQuery.notify(new TS3ClientDisconnectedEvent(
-                    client.clientName, client.clientId, client.clientUid));
+                serverQuery.getEventThread().notify(
+                        new TS3ClientDisconnectedEvent(client.clientName,
+                                client.clientId, client.clientUid));
             }
         }
 
@@ -164,14 +165,14 @@ public class TS3PollingThread extends Thread {
             if(previous == null) {
                 // Send an event notification if the client does not exist in
                 // the previous map of connected clients
-                serverQuery.notify(new TS3ClientConnectedEvent(
+                serverQuery.getEventThread().notify(new TS3ClientConnectedEvent(
                         client.clientName, client.clientId, client.clientUid));
             } else {
                 // Check if the client moved channels
                 if(client.channelId != previous.channelId) {
 
                     // Send notification
-                    serverQuery.notify(new TS3ClientMovedEvent(
+                    serverQuery.getEventThread().notify(new TS3ClientMovedEvent(
                             client.clientName, client.clientId,
                             client.clientUid, previous.channelId,
                             client.channelId));
