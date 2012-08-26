@@ -22,7 +22,7 @@ import org.slf4j.Logger;
  * all channels, a polling mechanism is required.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3PollingThread extends Thread {
 

@@ -9,7 +9,7 @@ import net.visualcoding.ts3serverquery.TS3EventListener;
  * enum.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3MessageEvent extends TS3Event {
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * This class is a container for the TS3 Server Query responses.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3Result {
 

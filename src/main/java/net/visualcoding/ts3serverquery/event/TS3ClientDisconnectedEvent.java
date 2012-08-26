@@ -7,7 +7,7 @@ import net.visualcoding.ts3serverquery.TS3EventListener;
  * server.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3ClientDisconnectedEvent extends TS3Event {
 

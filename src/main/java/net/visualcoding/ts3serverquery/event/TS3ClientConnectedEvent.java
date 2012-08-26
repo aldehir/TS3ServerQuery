@@ -6,7 +6,7 @@ import net.visualcoding.ts3serverquery.TS3EventListener;
  * This event is triggered when a client connects to the Teamspeak 3 server.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3ClientConnectedEvent extends TS3Event {
 

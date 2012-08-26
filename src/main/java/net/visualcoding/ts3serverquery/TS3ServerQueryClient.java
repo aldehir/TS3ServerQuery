@@ -20,7 +20,7 @@ import net.visualcoding.ts3serverquery.event.TS3MessageEvent;
  * server through the Teamspeak 3 Server Query.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  *
  * @todo Implement handling of server and channel notifications, i.e. when
  *       the polling thread is not spawned.

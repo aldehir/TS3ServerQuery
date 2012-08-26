@@ -7,7 +7,7 @@ import net.visualcoding.ts3serverquery.TS3EventListener;
  * another channel.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3ClientMovedEvent extends TS3Event {
 

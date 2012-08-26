@@ -11,7 +11,7 @@ import java.util.HashMap;
  * This class provides a map structure suitable for TS3 Server Query queries.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3Map {
 

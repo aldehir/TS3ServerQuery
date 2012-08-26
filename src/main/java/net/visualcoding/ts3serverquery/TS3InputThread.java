@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Teamspeak 3 Server to send a response after receiving a command.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3InputThread extends Thread {
 

@@ -7,7 +7,7 @@ import net.visualcoding.ts3serverquery.TS3EventListener;
  * are present in all TS3 events.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 abstract public class TS3Event {
 

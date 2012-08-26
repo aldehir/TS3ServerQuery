@@ -11,7 +11,7 @@ import java.io.BufferedWriter;
  * writes the string, appends the line-ending, and flushes the buffer.
  *
  * @author Aldehir Rojas
- * @version 1.0
+ * @version 1.0.0
  */
 public class TS3Writer extends BufferedWriter {
 
