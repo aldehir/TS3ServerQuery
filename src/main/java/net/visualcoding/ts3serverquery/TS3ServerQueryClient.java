@@ -190,6 +190,11 @@ public class TS3ServerQueryClient {
 
         // Wait for our threads to finish terminating
         try {
+            if(eventThread != null) {
+                eventThread.interrupt();
+                eventThread.join();
+            }
+
             if(inputThread != null) inputThread.join();
             if(pollingThread != null) pollingThread.join();
         } catch(InterruptedException e) {
